@@ -1,0 +1,65 @@
+#include "llmod3/llmod3.hsp"
+#include "llmod3/input.hsp"
+
+prev_happiness = 0
+threshold = 0.5
+
+screen 0, 1550, 1000
+
+font "ＭＳ Ｐゴシック",100, 1
+
+pos 0, 0
+mes "click here!"
+
+onclick gosub *clicked
+
+repeat
+	dim eye_position
+	getEyePosition(eye_position)
+	
+	happiness = getHappiness()
+	happiness = double(happiness)
+	
+	if (prev_happiness < threshold && happiness >= threshold) {
+		mouse eye_position(0), eye_position(1)
+		mouse_event $2 | $4 // mouse down and up
+		// mouse_event $2
+	} else : if (prev_happiness >= threshold && happiness < threshold) {
+		mouse eye_position(0), eye_position(1)
+		// mouse_event $4
+	}
+	
+	prev_happiness = happiness
+	await 10
+loop
+
+#module
+	// eye_positionは要素2つの配列。eye_position(0)に視線X座標、eye_position(1)に視線Y座標が入る。
+	#deffunc getEyePosition array eye_position
+		#include "hspext.as"
+		aplsel "-("
+		tobii_window_title = refstr
+		eye_position_string = strmid(tobii_window_title, 2, strlen(tobii_window_title) - 2)
+		split eye_position_string, ",", eye_x_position_string, eye_y_position_string
+		eye_position(0) = int(eye_x_position_string)
+		eye_position(1) = int(eye_y_position_string)
+		return
+#global
+
+#module
+	// eye_positionは要素2つの配列。eye_position(0)に視線X座標、eye_position(1)に視線Y座標が入る。
+	#defcfunc getHappiness 
+		#include "hspext.as"
+		aplsel "+("
+		happiness_window_title = refstr
+		happiness = strmid(happiness_window_title, 2, strlen(happiness_window_title) - 2)
+		return happiness
+#global
+
+*clicked
+	color 255, 255, 255
+	boxf 
+	color 0, 0, 0
+	pos mousex, mousey
+	mes "clicked!"
+	return
