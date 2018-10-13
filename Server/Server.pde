@@ -36,7 +36,7 @@ public class EchoGetHandler implements HttpHandler {
     os.write(response.getBytes());
 
     if (!happinessQuery.equals("")) {
-      surface.setTitle("-(" + happinessQuery);
+      surface.setTitle("+(" + happinessQuery);
       println(happinessQuery);
     }
 
